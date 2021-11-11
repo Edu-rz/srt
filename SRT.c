@@ -8,11 +8,11 @@ struct Process {
       int waiting_time;
 };
 
-struct Process* CreateProcess() {
+/*struct Process* CreateProcess() {
     struct Process* newProcess = NULL;
     newProcess = (struct Process*) malloc(sizeof(struct Process));
     return newProcess;
-}
+}*/
 
 struct Process* ScanProcessesByInput(int limit) {
     struct Process* processes = malloc(sizeof(struct Process) * limit);
@@ -86,18 +86,44 @@ void PrintCurrentState(struct Process* processes, int n_processes, int time, int
     printf("\n");
 }
 
+//DESDE AQUIIII
+float AverageExeTime(struct Process* processes, int n_processes){;
+    float prom;
+    for (int i = 0; i < n_processes; i++){
+        prom += processes[i].burst_time;
+    }
+    prom /= (float)n_processes;
+    //printf("\nTIEMPO DE RETORNO PROMEDIO: %0.2f\n", prom);
+    return prom;
+}
+
+float AverageWaitTime(struct Process* processes, int n_processes){
+    float prom;
+    for (int i = 0; i < n_processes; i++){
+        prom += processes[i].waiting_time;
+    }
+
+    prom /= (float)n_processes;
+    //printf("\nTIEMPO DE ESPERA PROMEDIO: %0.2f\n", prom);
+    return prom;
+}
+//HASTA AQUIIIIII
+
 int main() {
     int n_processes;
+    float ave_ex, ave_wait; //AQUI
     
     //Ingresar cantidad maxima de procesos
     printf("\nEnter the Total Number of Processes:\t");
     scanf("%d", &n_processes);
 
     struct Process* processes = ScanProcessesByInput(n_processes);
+    ave_ex = AverageExeTime(processes, n_processes); //AQUI
     DisplayAllProcesses(processes, n_processes);
-    
+       
     int left_processes = n_processes;
     int time = 0;
+
     while(left_processes > 0) {
         //printf("\n - TIME %d\n", time);
         struct Process* currentProcess = GetProcessWithLessBurstTime(processes, n_processes, time);
@@ -115,8 +141,15 @@ int main() {
         }
         time ++;
     }
-    
-    //DisplayAllProcesses(processes, n_processes);
 
+    DisplayAllProcesses(processes, n_processes);
+    
+    ave_wait = AverageWaitTime(processes, n_processes); //AQUI
+    //AQUIII
+    if(n_processes != 0){
+        printf("TIEMPO DE EJECUCION PROMEDIO: %0.2f", ave_ex); 
+        printf("\nTIEMPO DE ESPERA PROMEDIO: %0.2f", ave_wait); 
+    }
+    
     return 0;
 }
