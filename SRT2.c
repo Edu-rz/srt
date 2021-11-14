@@ -9,12 +9,16 @@ struct Process {
     int finished_time;
 };
 
-//LISTAAAAAAAAAAaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+//FUNCIONES PARA UN LINKED LIST
 
 struct Node {
     struct Process* data;
     struct Node* next;
 };
+
+// LinkedList
+// Node1  ->  Node2   -> Node3 ->  Node4 -> NULL
+//  1           2         3   ...
 
 struct LinkedList {
     struct Node* head;
@@ -29,8 +33,8 @@ struct Node* CreateNode(struct Process* data) {
 }
 
 void Append(struct LinkedList* list, struct Process* process) {
-    if(list->head == NULL) {
-        list->head = CreateNode(process);
+    if(list->head == NULL) { // en caso la lista este vacia
+        list->head = CreateNode(process); // añadir el primer elemento
         return;
     }
 
@@ -58,7 +62,7 @@ struct LinkedList* CreateLinkedList() {
     return list;
 }
 
-// PROGRAMAAAAAAAAAAAAAAA
+// FUNCIONES PARA EL ALGORITMO SRT
 
 struct Process* ScanProcessesByInput(int limit) {
     struct Process* processes = malloc(sizeof(struct Process) * limit);
@@ -103,21 +107,6 @@ void AddWaitingTime(struct LinkedList* list, int time, int current_process_id) {
         }
         currentNode = currentNode->next;
     }
-}
-
-void PrintCurrentState(struct Process* processes, int n_processes, int time, int current_process_id) {
-    printf("  %02d  ", time);
-    
-    for(int i=0; i < n_processes; i++) {
-        if(processes[i].id == current_process_id) {
-            printf("X ");
-        } else if(processes[i].arrival_time <= time && processes[i].burst_time > 0) {
-            printf("W ");
-        } else {
-            printf("  ");
-        }
-    }
-    printf("\n");
 }
 
 float AverageExeTime(struct Process* processes, int n_processes){;
@@ -165,15 +154,20 @@ struct Process* GetProcessWithLessBurstTime(struct LinkedList* remainingProcesse
     return proc;
 }
 
-void PrintDisplay(int display[], struct Process* processes, int n_processes) {
+void PrintDisplay(int display[], struct Process* processes, int n_processes, int last_time) {
+    // imprimir del 0 al 100 con un for
+    for(int i = 0; i < last_time; i++) {
+        printf("%.2d ", i);
+    }
+    printf("\n");
     for(int i = 0; i < n_processes; i++) {
-        for(int time = 0; time < 100; time++) {
+        for(int time = 0; time < last_time; time++) {
             if(display[time] == processes[i].id) {
-                printf("X");
+                printf("X  ");
             } else if(processes[i].arrival_time <= time && time < processes[i].finished_time) {
-                printf("W");
+                printf("W  ");
             } else {
-                printf(" ");
+                printf("   ");
             }
         }
         printf("\n");
@@ -182,9 +176,9 @@ void PrintDisplay(int display[], struct Process* processes, int n_processes) {
 
 int main() {
     int n_processes;
-    float ave_ex, ave_wait; //AQUI
+    float ave_ex, ave_wait;
     int display[100];
-    for(int i = 0; i < 100; i++) {
+    for(int i = 0; i < 100; i++) { // esto es para inicializar la variable display con -1
         display[i] = -1;
     }
     
@@ -193,15 +187,17 @@ int main() {
     scanf("%d", &n_processes);
     struct Process* processes = ScanProcessesByInput(n_processes);
     ave_ex = AverageExeTime(processes, n_processes); //AQUI
-    //DisplayAllProcesses(processes, n_processes);
+    
+    DisplayAllProcesses(processes, n_processes);
        
     int left_processes = n_processes;
     int time = 0;
     while(left_processes > 0) {
+        // Proceso 1 2 3 4 5
+        // 2 4 5
         struct LinkedList* remaminingProcessesList = GetListWithRemainingProcesses(remaminingProcessesList, processes, n_processes, time);
 
         if(remaminingProcessesList->head == NULL) { //si la lista esta vacia
-            PrintCurrentState(processes, n_processes, time, -1);
             time ++;
             continue;
         }
@@ -209,8 +205,9 @@ int main() {
         struct Process* currentProcess = GetProcessWithLessBurstTime(remaminingProcessesList, time);
         currentProcess->burst_time--;
         AddWaitingTime(remaminingProcessesList, time, currentProcess->id);
+        
         display[time] = currentProcess->id;
-        PrintCurrentState(processes, n_processes, time, currentProcess->id);
+        
         if(currentProcess->burst_time == 0) {
             left_processes--;
             currentProcess->finished_time = time + 1;
@@ -218,15 +215,14 @@ int main() {
         time ++;
     }
 
-    PrintDisplay(display, processes, n_processes);
-    //DisplayAllProcesses(processes, n_processes);
+    PrintDisplay(display, processes, n_processes, time);
     
-    // ave_wait = AverageWaitTime(processes, n_processes); //AQUI
-    // //AQUIII
-    // if(n_processes != 0){
-    //     printf("TIEMPO DE EJECUCION PROMEDIO: %0.2f", ave_ex); 
-    //     printf("\nTIEMPO DE ESPERA PROMEDIO: %0.2f", ave_wait); 
-    // }
+    ave_wait = AverageWaitTime(processes, n_processes);
+
+    if(n_processes > 0){
+        printf("TIEMPO DE EJECUCION PROMEDIO: %0.2f", ave_ex); 
+        printf("\nTIEMPO DE ESPERA PROMEDIO: %0.2f", ave_wait); 
+    }
     
     return 0;
 }
