@@ -32,6 +32,6 @@ void ColorWhite() {
     printf("\033[0;37m");
 }
 
-void ColorReset () {
+void ColorReset() {
     printf("\033[0m");
 }

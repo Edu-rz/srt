@@ -259,6 +259,7 @@ void PrintQueueDisplay(int n_processes, int last_time, int display2[100][n_proce
     ColorReset();
     printf("\n");
     for(int j = 0; j < n_processes; j++) {
+        printf("   ");
         for(int i = 0; i < last_time; i++) {
             if(display2[i][j] == -1) {
                 printf("   ");
@@ -272,15 +273,38 @@ void PrintQueueDisplay(int n_processes, int last_time, int display2[100][n_proce
 }
 
 
+// Rellenar un arreglo de 1 dimensión con el parametro `value`
+void Initialize1DArray(int length, int array[length], int value) {
+
+}
+
+// Rellenar un arreglo de 2 dimensiones con el parametro `value`
+void Initialize2DArray(int length, int height, int array[length][height], int value) {
+    
+}
+
+// Retornar el tiempo promedio de servicio
+float AverageServiceTime() {
+
+}
+
+// Retornar el tiempo promedio de retorno normalizado
+float AverageNormalizeReturnTime() {
+
+}
+
+
+
 int main() {
     int n_processes;
     float ave_ex, ave_wait;
     char* path = "./SRT/data.txt";
+    
     int display[100];
     for(int i = 0; i < 100; i++) { //  inicializar la display con -1
         display[i] = -1;
     }
-    
+
     //Ingresar cantidad maxima de procesos
     // printf("\nEnter the Total Number of Processes:\t");
     // scanf("%d", &n_processes);
@@ -331,8 +355,10 @@ int main() {
     ave_wait = AverageWaitTime(processes, n_processes);
 
     if(n_processes > 0){
-        printf("TIEMPO DE EJECUCION PROMEDIO: %0.4f", ave_ex); 
-        printf("\nTIEMPO DE ESPERA PROMEDIO: %0.4f", ave_wait); 
+        printf("TIEMPO DE EJECUCION PROMEDIO: %0.4f", ave_ex);
+        printf("\nTIEMPO DE ESPERA PROMEDIO: %0.4f", ave_wait);
+        //Mostrar Tiempo de servicio
+        //Mostrar Tiempo de retorno normalizado
     }
     
     return 0;
