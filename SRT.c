@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "util.h"
 
 struct Process {
       int id;
       int arrival_time;
       int burst_time;
       int waiting_time;
+      int finished_time;
 };
 
 /*struct Process* CreateProcess() {
@@ -26,6 +28,8 @@ struct Process* ScanProcessesByInput(int limit) {
 
         processes[i].arrival_time = arrival_time;
         processes[i].burst_time = burst_time;
+        processes[i].waiting_time = 0;
+        processes[i].finished_time = -1;
         processes[i].id = i;
     }
 
@@ -71,17 +75,45 @@ struct Process* AddWaitingTime(struct Process* processes, int n_processes, int t
     }
 }
 
-void PrintCurrentState(struct Process* processes, int n_processes, int time, int current_process_id) {
-    printf("  %02d  ", time);
+// void PrintCurrentState(struct Process* processes, int n_processes, int time, int current_process_id) {
+//     printf("  %02d  ", time);
     
-    for(int i=0; i < n_processes; i++) {
-        if(processes[i].id == current_process_id) {
-            printf("X ");
-        } else if(processes[i].arrival_time <= time && processes[i].burst_time > 0) {
-            printf("W ");
-        } else {
-            printf("  ");
+//     for(int i=0; i < n_processes; i++) {
+//         if(processes[i].id == current_process_id) {
+//             printf("X ");
+//         } else if(processes[i].arrival_time <= time && processes[i].burst_time > 0) {
+//             printf("W ");
+//         } else {
+//             printf("  ");
+//         }
+//     }
+//     printf("\n");
+// }
+
+void PrintDisplay(int display[], struct Process* processes, int n_processes, int last_time) {
+    printf("\n ---   TIMELINE DISPLAY   ---   \n");
+    // imprimir del 0 al 100 con un for
+    printf("   ");
+    for(int i = 0; i < last_time; i++) {
+        printf("%.2d ", i);
+    }
+    printf("\n");
+    for(int i = 0; i < n_processes; i++) {
+        printf("%d  ", processes[i].id);
+        for(int time = 0; time < last_time; time++) {
+            if(display[time] == processes[i].id) {
+                ColorYellow();
+                printf("X  ");
+                ColorReset();
+            } else if(processes[i].arrival_time <= time && time < processes[i].finished_time) {
+                ColorRed();
+                printf("W  ");
+                ColorReset();
+            } else {
+                printf("   ");
+            }
         }
+        printf("\n");
     }
     printf("\n");
 }
@@ -112,6 +144,11 @@ float AverageWaitTime(struct Process* processes, int n_processes){
 int main() {
     int n_processes;
     float ave_ex, ave_wait; //AQUI
+    int display[100];
+    for(int i = 0; i < 100; i++) { //  inicializar la display con -1
+        display[i] = -1;
+    }
+    
     
     //Ingresar cantidad maxima de procesos
     printf("\nEnter the Total Number of Processes:\t");
@@ -134,14 +171,16 @@ int main() {
 
         currentProcess->burst_time--;
         AddWaitingTime(processes, n_processes, time, currentProcess->id);
-
-        PrintCurrentState(processes, n_processes, time, currentProcess->id);
+        display[time] = currentProcess->id;
+        // PrintCurrentState(processes, n_processes, time, currentProcess->id);
         if(currentProcess->burst_time == 0) {
             left_processes--;
+            currentProcess->finished_time = time + 1;
         }
         time ++;
     }
 
+    PrintDisplay(display, processes, n_processes, time);
     DisplayAllProcesses(processes, n_processes);
     
     ave_wait = AverageWaitTime(processes, n_processes); //AQUI
