@@ -298,7 +298,7 @@ float AverageNormalizeReturnTime() {
 int main() {
     int n_processes;
     float ave_ex, ave_wait;
-    char* path = "./SRT/data.txt";
+    char* path = "C:/Users/joaqu/Documents/GitHub/SRT/data.txt";
     
     int display[100];
     for(int i = 0; i < 100; i++) { //  inicializar la display con -1
