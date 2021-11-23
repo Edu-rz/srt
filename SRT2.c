@@ -3,7 +3,6 @@
 #include <string.h>
 #include "util.h"
 
-
 // Estructura PROCESS
 struct Process {
     int id;
@@ -131,19 +130,20 @@ struct Process* ScanProcessesByText(char* path) {
 
 // Dado un puntero de un proceso, imprime sus datos en el terminal
 void DisplayProcess(struct Process* process) {
-    printf("\nDISPLAY PROCESS DATA\n");
-    printf("  id -> %d  \n", process->id);
-    printf("  arrival_time -> %d  \n", process->arrival_time);
-    printf("  burst_time -> %d  \n", process->burst_time);
-    printf("  waiting_time -> %d  \n", process->waiting_time);
     printf("\n");
+    printf("\t%d", process->id);
+    printf("\t\t%d", process->arrival_time);
+    printf("\t%d", process->burst_time);
+    printf("\t\t%d", process->waiting_time);
 }
 
 // Dado un puntero y el número de procesos, imprime todos los procesos
 void DisplayAllProcesses(struct Process* processes, int n_processes) {
+    printf("\n\tid\tarrival_time\tburst_time\twaiting_time");
     for(int i = 0; i < n_processes; i++) {
         DisplayProcess(&processes[i]);
     }
+    printf("\n");
 }
 
 // Dada la cola de listos, añade una unidad de tiempo a todos los procesos que no se están ejecutando
@@ -157,26 +157,6 @@ void AddWaitingTime(struct LinkedList* list, int current_process_id) {
         }
         currentNode = currentNode->next;
     }
-}
-
-// Retorna el tiempo promedio de ejecución
-float AverageExeTime(struct Process* processes, int n_processes){;
-    float prom;
-    for (int i = 0; i < n_processes; i++){
-        prom += processes[i].burst_time;
-    }
-    prom /= (float)n_processes;
-    return prom;
-}
-
-// Retorna el tiempo promedio de espera
-float AverageWaitTime(struct Process* processes, int n_processes){
-    float prom;
-    for (int i = 0; i < n_processes; i++){
-        prom += processes[i].waiting_time;
-    }
-    prom /= (float)n_processes;
-    return prom;
 }
 
 // Insertar a una lista, todos los procesos listos, y retornar el puntero de aquella lista
@@ -208,14 +188,37 @@ struct Process* GetProcessWithLessBurstTime(struct LinkedList* remainingProcesse
     return proc;
 }
 
+// Ordenar DIRECTAMENTE el arreglo de procesos por tiempo de ráfaga (no utilizar un arreglo auxiliar, modificarlo directamente)
+void SortProcessArrayByBurstTime(int length, struct Process* array[length]) {
+    for(int i = 0; i < length - 1; i++) {
+        for(int j = 0; j < length - i - 1; j++) {
+            if(array[j]->burst_time > array[j + 1]->burst_time) {
+                struct Process* temp = array[j];
+                array[j] = array[j + 1];
+                array[j + 1] = temp;
+            }
+        }
+    }
+}
+
 // Almacena en display2 información importante para luego mostrarlo en pantalla con el formato adecuado
 void UpdateDisplay2(struct LinkedList* remaminingProcessesList, int n_processes, int display2[100][n_processes], int time) {
+    if(remaminingProcessesList->head == NULL) return;
     struct Node* curProcess = remaminingProcessesList->head;
+    struct Process* current_processes[n_processes];
+
     int i = 0;
     while(curProcess != NULL) {
-        display2[time][i] = curProcess->data->id;
+        current_processes[i] = curProcess->data;
         curProcess = curProcess->next;
         i++;
+    }
+
+    SortProcessArrayByBurstTime(i, current_processes);
+
+    // Una vez ordenado el arreglo, guardar la id de los procesos en display2[time]
+    for(int j = 0; j < i; j++) {
+        display2[time][j] = current_processes[j]->id;
     }
 }
 
@@ -228,6 +231,7 @@ void PrintDisplay(int display[], struct Process* processes, int n_processes, int
         printf("%.2d ", i);
     }
     printf("\n");
+
     for(int i = 0; i < n_processes; i++) {
         printf("%d  ", processes[i].id);
         for(int time = 0; time < last_time; time++) {
@@ -252,11 +256,13 @@ void PrintDisplay(int display[], struct Process* processes, int n_processes, int
 void PrintQueueDisplay(int n_processes, int last_time, int display2[100][n_processes]) {
     printf("\n ---   QUEUE DISPLAY   ---   \n");
     printf("   ");
+    
     ColorBlue();
     for(int i = 0; i < last_time; i++) {
         printf("%.2d ", i);
     }
     ColorReset();
+
     printf("\n");
     for(int j = 0; j < n_processes; j++) {
         printf("   ");
@@ -272,41 +278,40 @@ void PrintQueueDisplay(int n_processes, int last_time, int display2[100][n_proce
     printf("\n");
 }
 
-// Rellenar un arreglo de 1 dimensión con el parametro `value`
-void Initialize1DArray(int length, int* array, int value) {
-    for (int i = 0; i < length; i++){
-        array[i] = value;
+// Retorna el tiempo promedio de ejecución
+float AverageExeTime(struct Process* processes, int n_processes){;
+    float prom;
+    for (int i = 0; i < n_processes; i++){
+        prom += processes[i].burst_time;
     }
+    prom /= (float)n_processes;
+    return prom;
 }
 
-// Rellenar un arreglo de 2 dimensiones con el parametro `value`
-void Initialize2DArray(int length, int height, int* array, int value) {
-    for (int i = 0; i < length * height; i++){
-        array[i] = value;
+// Retorna el tiempo promedio de espera
+float AverageWaitTime(struct Process* processes, int n_processes){
+    float prom;
+    for (int i = 0; i < n_processes; i++){
+        prom += processes[i].waiting_time;
     }
+    prom /= (float)n_processes;
+    return prom;
 }
 
 // Retornar el tiempo promedio de servicio
-float AverageServiceTime(float ave_ex, float ave_wait) 
-{
+float AverageServiceTime(float ave_ex, float ave_wait) {
     return ave_ex - ave_wait;
 }
 
 // Retornar el tiempo promedio de retorno normalizado
-float AverageNormalizeReturnTime(float aver_tiemposerv, float ave_ex) 
-{
+float AverageNormalizeReturnTime(float aver_tiemposerv, float ave_ex) {
     return ave_ex/aver_tiemposerv;
 }
 
 
 int main() {
     int n_processes;
-    float ave_ex, ave_wait, ave_ser;
-    char* path = "C:/Users/joaqu/Documents/GitHub/SRT/data.txt";
-    
-    //Inicializar Display 1 
-    int display[100];
-    Initialize1DArray(100, display, -1);
+    char* path = "./SRT/data.txt";
     
     //Ingresar cantidad maxima de procesos
     // printf("\nEnter the Total Number of Processes:\t");
@@ -316,18 +321,27 @@ int main() {
     struct Process* processes = ScanProcessesByText(path);
     // struct Process* processes = ScanProcessesByInput(n_processes);
     
-    ave_ex = AverageExeTime(processes, n_processes); //AQUI
-    DisplayAllProcesses(processes, n_processes);
+    float ave_ex = AverageExeTime(processes, n_processes);
 
+    //Inicializar Display 1 
+    int display[100];
+    Initialize1DArray(100, display, -1);
     //Inicializar Display 2
     int display2[100][n_processes];
     Initialize2DArray(100, n_processes, (int*)display2, -1); 
 
+
+    if(n_processes <= 0){
+        exit(0);
+    }
+
+
+    DisplayAllProcesses(processes, n_processes);
     int left_processes = n_processes;
     int time = 0;
     while(left_processes > 0) {
-        // Proceso 1 2 3 4 5
-        // 2 4 5
+        
+        //Obtener la cola de listos
         struct LinkedList* remaminingProcessesList = GetListWithRemainingProcesses(remaminingProcessesList, processes, n_processes, time);
 
         if(remaminingProcessesList->head == NULL) { //si la lista esta vacia
@@ -335,12 +349,16 @@ int main() {
             continue;
         }
 
+        ///Obtener el proceso con menor tiempo de ráfaga
         struct Process* currentProcess = GetProcessWithLessBurstTime(remaminingProcessesList, time);
         currentProcess->burst_time--;
+        
+        //Añadir 1 tiempo de espera a todos los procesos en la cola de listos, que no se están ejecutando 
         AddWaitingTime(remaminingProcessesList, currentProcess->id);
         
-        // Tomar registros de los procesos en ejecución y la cola de listos
+        // Tomar registros de los procesos en ejecución
         display[time] = currentProcess->id;
+        // Tomar registro de la cola de listos
         UpdateDisplay2(remaminingProcessesList, n_processes, display2, time);
 
         if(currentProcess->burst_time == 0) {
@@ -352,14 +370,15 @@ int main() {
 
     PrintDisplay(display, processes, n_processes, time);
     PrintQueueDisplay(n_processes, time, display2);
-    ave_wait = AverageWaitTime(processes, n_processes);
 
-    if(n_processes > 0){
-        printf("TIEMPO DE EJECUCION PROMEDIO: %0.4f", ave_ex);
-        printf("\nTIEMPO DE ESPERA PROMEDIO: %0.4f", ave_wait);
-        
-        //Mostrar Tiempo de retorno normalizado
-    }
+    float ave_wait = AverageWaitTime(processes, n_processes);
+    float ave_ser = AverageServiceTime(ave_ex, ave_wait);
+    float normalized_wait = AverageNormalizeReturnTime(ave_ser, ave_ex);
+
+    printf("TIEMPO DE EJECUCION PROMEDIO: %0.4f", ave_ex);
+    printf("\nTIEMPO DE ESPERA PROMEDIO: %0.4f", ave_wait);
+    printf("\nTIEMPO DE SERVICIO: %0.4f", ave_ser);
+    printf("\nTIEMPO DE ESPERA NORMALIZADO: %0.4f", normalized_wait);
     
     return 0;
 }
