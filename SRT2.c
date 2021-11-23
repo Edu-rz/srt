@@ -286,11 +286,17 @@ void Initialize2DArray(int length, int height, int* array, int value) {
     }
 }
 
-// Retornar el tiempo promedio de retorno normalizado
-float AverageNormalizeReturnTime() {
-
+// Retornar el tiempo promedio de servicio
+float AverageServiceTime(float ave_ex, float ave_wait) 
+{
+    return ave_ex - ave_wait;
 }
 
+// Retornar el tiempo promedio de retorno normalizado
+float AverageNormalizeReturnTime(float aver_tiemposerv, float ave_ex) 
+{
+    return ave_ex/aver_tiemposerv;
+}
 
 
 int main() {
