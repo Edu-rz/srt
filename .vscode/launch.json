@@ -5,11 +5,13 @@
       "name": "C/C++ Runner: Debug Session",
       "type": "cppdbg",
       "request": "launch",
-      "args": [],
+      "args": [
+        ""
+      ],
       "stopAtEntry": false,
-      "cwd": "c:\\Users\\frank\\Documents\\GitHub\\SRT",
+      "cwd": "c:/Users/frank/Documents/GitHub/SRT",
       "environment": [],
-      "program": "c:\\Users\\frank\\Documents\\GitHub\\SRT\\build\\Debug\\outDebug",
+      "program": "c:/Users/frank/Documents/GitHub/SRT/build/Debug/outDebug",
       "internalConsoleOptions": "openOnSessionStart",
       "MIMode": "gdb",
       "miDebuggerPath": "C:/mingw64/bin/gdb.exe",
