@@ -279,7 +279,7 @@ void PrintQueueDisplay(int n_processes, int last_time, int display2[100][n_proce
 }
 
 // Retorna el tiempo promedio de ejecución
-float AverageExeTime(struct Process* processes, int n_processes){;
+float AverageServiceTime(struct Process* processes, int n_processes){;
     float prom;
     for (int i = 0; i < n_processes; i++){
         prom += processes[i].burst_time;
@@ -298,11 +298,6 @@ float AverageWaitTime(struct Process* processes, int n_processes){
     return prom;
 }
 
-// Retornar el tiempo promedio de servicio
-float AverageServiceTime(float ave_ex, float ave_wait) {
-    return ave_ex - ave_wait;
-}
-
 // Retornar el tiempo promedio de retorno normalizado
 float AverageNormalizeReturnTime(float aver_tiemposerv, float ave_ex) {
     return ave_ex/aver_tiemposerv;
@@ -311,7 +306,7 @@ float AverageNormalizeReturnTime(float aver_tiemposerv, float ave_ex) {
 
 int main() {
     int n_processes;
-    char* path = "./SRT/data.txt";
+    char* path = "C:/Users/joaqu/Downloads/EF_EQUIPO05/PROGRAMA_EQUIPO05/data.txt";
     
     //Ingresar cantidad maxima de procesos
     // printf("\nEnter the Total Number of Processes:\t");
@@ -321,7 +316,7 @@ int main() {
     struct Process* processes = ScanProcessesByText(path);
     // struct Process* processes = ScanProcessesByInput(n_processes);
     
-    float ave_ex = AverageExeTime(processes, n_processes);
+    float ave_ser = AverageServiceTime(processes, n_processes);
 
     //Inicializar Display 1 
     int display[100];
@@ -372,13 +367,13 @@ int main() {
     PrintQueueDisplay(n_processes, time, display2);
 
     float ave_wait = AverageWaitTime(processes, n_processes);
-    float ave_ser = AverageServiceTime(ave_ex, ave_wait);
-    float normalized_wait = AverageNormalizeReturnTime(ave_ser, ave_ex);
+    float normalized_ret = AverageNormalizeReturnTime(ave_ser + ave_wait, ave_ser);
 
-    printf("TIEMPO DE EJECUCION PROMEDIO: %0.4f", ave_ex);
+    printf("\nTIEMPO DE RETORNO PROMEDIO: %0.4f", ave_ser + ave_wait);
     printf("\nTIEMPO DE ESPERA PROMEDIO: %0.4f", ave_wait);
     printf("\nTIEMPO DE SERVICIO: %0.4f", ave_ser);
-    printf("\nTIEMPO DE ESPERA NORMALIZADO: %0.4f", normalized_wait);
+    printf("\nTIEMPO DE RETORNO NORMALIZADO: %0.4f", normalized_ret);
     
     return 0;
 }
+
