@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include "util.h"
  
 struct Process {
       int id;
@@ -81,9 +81,13 @@ void PrintDisplay(int display[], struct Process* processes, int n_processes, int
         printf("%d  ", processes[i].id);
         for(int time = 0; time < last_time; time++) {
             if(display[time] == processes[i].id) {
+                ColorYellow();
                 printf("X  ");
+                ColorReset();
             } else if(processes[i].arrival_time <= time && time < processes[i].finished_time) {
+                ColorRed();
                 printf("W  ");
+                ColorReset();
             } else {
                 printf("   ");
             }
