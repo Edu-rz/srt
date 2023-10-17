@@ -306,7 +306,7 @@ float AverageNormalizeReturnTime(float aver_tiemposerv, float ave_ex) {
 
 int main() {
     int n_processes;
-    char* path = "C:/Users/joaqu/Downloads/EF_EQUIPO05/PROGRAMA_EQUIPO05/data.txt";
+    char* path = "./data.txt";
     
     //Ingresar cantidad maxima de procesos
     // printf("\nEnter the Total Number of Processes:\t");
